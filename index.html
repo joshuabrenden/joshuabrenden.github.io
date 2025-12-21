@@ -1,47 +1,784 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Otto Brenden</title>
-        <style type="text/css">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Collection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: #e8e8e8;
+            color: #000;
+            line-height: 1.5;
+            padding: 60px 80px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 80px;
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            font-size: 24px;
+            font-style: italic;
+            font-weight: 300;
+            letter-spacing: 0.01em;
+        }
+
+        nav {
+            display: flex;
+            gap: 40px;
+            padding-top: 8px;
+        }
+
+        .nav-link {
+            font-size: 24px;
+            color: #000;
+            text-decoration: none;
+            transition: opacity 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            opacity: 0.6;
+        }
+
+        .nav-link.active {
+            text-decoration: underline;
+        }
+
+        .filters-section {
+            margin-bottom: 50px;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 600px;
+            padding: 14px 0;
+            font-size: 24px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #000;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .search-input::placeholder {
+            color: #999;
+        }
+
+        .categories-container {
+            margin-bottom: 15px;
+        }
+
+        .category-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+        }
+
+        #categories-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .category-tag {
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid #000;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .category-tag:hover {
+            background: #000;
+            color: #e8e8e8;
+        }
+
+        .category-tag.active {
+            background: #000;
+            color: #e8e8e8;
+        }
+
+        .tags-container {
+            margin-top: 20px;
+        }
+
+        .tag-group {
+            margin-bottom: 15px;
+        }
+
+        .tag-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        .tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            padding: 6px 12px;
+            background: transparent;
+            border: 1px solid #ccc;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .tag:hover {
+            border-color: #000;
+            background: #fff;
+        }
+
+        .tag.active {
+            background: #000;
+            color: #e8e8e8;
+            border-color: #000;
+        }
+
+        .clear-filters {
+            background: none;
+            border: none;
+            font-size: 14px;
+            text-decoration: underline;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: opacity 0.2s;
+        }
+
+        .clear-filters:hover {
+            opacity: 0.6;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #000;
+            margin-bottom: 2px;
+        }
+
+        .results-count {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        .recipe-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 18px 0;
+            border-bottom: 1px solid #000;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .recipe-item:hover {
+            opacity: 0.6;
+        }
+
+        .recipe-name {
+            font-size: 32px;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+        }
+
+        .recipe-cuisine {
+            font-size: 32px;
+            font-weight: 400;
+            text-align: right;
+        }
+
+        .recipe-tags-inline {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        #back-button {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            margin-bottom: 40px;
+            padding: 8px 0;
+            transition: opacity 0.2s;
+        }
+
+        #back-button:hover {
+            opacity: 0.6;
+        }
+
+        #recipe-content h2 {
+            font-size: 48px;
+            font-weight: 400;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        #recipe-content .recipe-meta {
+            font-size: 18px;
+            font-style: italic;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        #recipe-content .recipe-tags-detail {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 40px;
+        }
+
+        #recipe-content .recipe-tags-detail .tag {
+            background: #000;
+            color: #e8e8e8;
+            border-color: #000;
+        }
+
+        #recipe-content h3 {
+            font-size: 24px;
+            font-weight: 400;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 16px;
+        }
+
+        #recipe-content .recipe-description {
+            font-size: 20px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            max-width: 800px;
+        }
+
+        #recipe-content ul {
+            list-style: none;
+            margin-bottom: 40px;
+        }
+
+        #recipe-content li {
+            font-size: 18px;
+            padding: 8px 0;
+            border-bottom: 1px solid #ccc;
+        }
+
+        #recipe-content ol {
+            list-style: none;
+            counter-reset: step-counter;
+            margin-bottom: 40px;
+        }
+
+        #recipe-content ol li {
+            counter-increment: step-counter;
+            padding: 16px 0;
+            border-bottom: 1px solid #ccc;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        #recipe-content ol li::before {
+            content: counter(step-counter) ". ";
+            font-weight: 400;
+            margin-right: 8px;
+        }
+
+        #about h2 {
+            font-size: 48px;
+            font-weight: 400;
+            margin-bottom: 30px;
+            letter-spacing: -0.02em;
+        }
+
+        #about p {
+            font-size: 20px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            max-width: 800px;
+        }
+
+        .no-results {
+            font-size: 20px;
+            padding: 40px 0;
+            text-align: center;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
             body {
-                margin: 40px auto;
-                max-width: 650px;
-                line-height: 1.6;
-                font-size: 18px;
-                color: #444;
-                padding: 0 10px
+                padding: 40px 30px;
             }
 
-            h1,h2,h3 {
-                line-height: 1.2
+            header {
+                flex-direction: column;
+                gap: 30px;
+                margin-bottom: 50px;
             }
-        </style>
-    </head>
-    <body>
-        <header>
-            <h1>
-                Our son <em>Otto</em>.
-            </h1>
-            <aside>10 weeks old.</aside>
-        </header>
-        <p>
-            We had so many places we wanted to take you, so many experiences we wanted to share, so many lessons we wanted to teach you.
-            Our hearts ache from your loss.
-        </p>
-        <p>
-            You made us parents and changed us forever. 
-        </p>
-        <p>
-            We will love you always.
-        </p>
-        <img src="baby.jpg" alt="otto ultrasound" width="500" height="400">
-        <hr>
-        <blockquote>
-            The LORD is close to the brokenhearted and saves those who are crushed in spirit.
-            <br>Psalm 34:18
-        </blockquote>        
-        <hr>
-    </body>
+
+            h1 {
+                font-size: 32px;
+            }
+
+            .subtitle {
+                font-size: 20px;
+            }
+
+            nav {
+                gap: 30px;
+            }
+
+            .nav-link {
+                font-size: 20px;
+            }
+
+            .search-input {
+                font-size: 20px;
+            }
+
+            .recipe-name,
+            .recipe-cuisine {
+                font-size: 24px;
+            }
+
+            #recipe-content h2 {
+                font-size: 36px;
+            }
+
+            #about h2 {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <h1>Jerry and Sandy's Recipes</h1>
+            <!-- <p class="subtitle">— A Curated Selection</p> -->
+        </div>
+        <nav>
+            <a class="nav-link active" data-view="list">Recipes</a>
+            <a class="nav-link" data-view="about">About</a>
+        </nav>
+    </header>
+
+    <main>
+        <section id="recipe-list" class="view active">
+            <div class="filters-section">
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        class="search-input" 
+                        placeholder="Search recipes..."
+                    />
+                </div>
+
+                <div class="categories-container">
+                    <div class="category-label">Category</div>
+                    <div id="categories-list"></div>
+                </div>
+
+                <div class="tags-container">
+                    <div class="tag-group">
+                        <div class="tag-label">Tags</div>
+                        <div class="tags-list" id="recipe-tags"></div>
+                    </div>
+                </div>
+
+                <button id="clear-filters" class="clear-filters">Clear all filters</button>
+            </div>
+
+            <div class="results-count" id="results-count"></div>
+
+            <div class="section-header">
+                <span>Dish</span>
+                <span>Category</span>
+            </div>
+            <div id="recipes-container"></div>
+            <div id="no-results" class="no-results" style="display: none;">
+                No recipes found matching your criteria.
+            </div>
+        </section>
+
+        <section id="recipe-detail" class="view">
+            <button id="back-button">← Back to recipes</button>
+            <article id="recipe-content"></article>
+        </section>
+
+        <section id="about" class="view">
+            <img src="jcb605 2.jpg" alt="Jerry and Sandy Brenden" style="max-width: 400px; height: auto; margin: 20px 0; border-radius: 8px;">
+            <p>A collection of Jerry and Sandy Brenden's family recipes.</p>
+            <p>Please report any issues with recipes to jpb-its-me@proton.me</p>
+        </section>
+    </main>
+
+    <script src="recipes.js"></script>
+    <script>
+        // Recipes loaded from external file
+
+        // Main application logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const recipesContainer = document.getElementById('recipes-container');
+            const recipeListView = document.getElementById('recipe-list');
+            const recipeDetailView = document.getElementById('recipe-detail');
+            const aboutView = document.getElementById('about');
+            const recipeContent = document.getElementById('recipe-content');
+            const backButton = document.getElementById('back-button');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const searchInput = document.getElementById('search-input');
+            const clearFiltersBtn = document.getElementById('clear-filters');
+            const noResults = document.getElementById('no-results');
+            const resultsCount = document.getElementById('results-count');
+
+            let activeFilters = {
+                search: '',
+                category: null,
+                tags: []
+            };
+
+            // Initialize the app
+            init();
+
+            // Handle browser navigation (back/forward buttons)
+            window.addEventListener('hashchange', handleHashChange);
+            
+            // Handle initial URL on page load
+            handleHashChange();
+
+            function init() {
+                renderCategories();
+                renderTags();
+                renderRecipeList();
+                setupNavigation();
+                setupBackButton();
+                setupSearch();
+                setupClearFilters();
+            }
+
+            // Extract unique categories
+            function getCategories() {
+                return [...new Set(recipes.map(r => r.category))].sort();
+            }
+
+            // Extract unique tags
+            function getTags() {
+                const tags = new Set();
+                recipes.forEach(recipe => {
+                    recipe.tags.forEach(tag => tags.add(tag));
+                });
+                return [...tags].sort();
+            }
+
+            // Render categories
+            function renderCategories() {
+                const categoriesList = document.getElementById('categories-list');
+                const categories = getCategories();
+                
+                categoriesList.innerHTML = categories.map(category => 
+                    `<button class="category-tag" data-category="${category}">${category}</button>`
+                ).join('');
+
+                categoriesList.querySelectorAll('.category-tag').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const category = this.dataset.category;
+                        if (activeFilters.category === category) {
+                            activeFilters.category = null;
+                            this.classList.remove('active');
+                        } else {
+                            categoriesList.querySelectorAll('.category-tag').forEach(b => b.classList.remove('active'));
+                            activeFilters.category = category;
+                            this.classList.add('active');
+                        }
+                        filterRecipes();
+                    });
+                });
+            }
+
+            // Render tag filters
+            function renderTags() {
+                const container = document.getElementById('recipe-tags');
+                const tags = getTags();
+                
+                container.innerHTML = tags.map(tag => 
+                    `<button class="tag" data-tag="${tag}">${tag}</button>`
+                ).join('');
+
+                container.querySelectorAll('.tag').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const tagValue = this.dataset.tag;
+                        
+                        const index = activeFilters.tags.indexOf(tagValue);
+                        if (index > -1) {
+                            activeFilters.tags.splice(index, 1);
+                            this.classList.remove('active');
+                        } else {
+                            activeFilters.tags.push(tagValue);
+                            this.classList.add('active');
+                        }
+                        
+                        filterRecipes();
+                    });
+                });
+            }
+
+            // Setup search
+            function setupSearch() {
+                searchInput.addEventListener('input', function() {
+                    activeFilters.search = this.value.toLowerCase();
+                    filterRecipes();
+                });
+            }
+
+            // Setup clear filters
+            function setupClearFilters() {
+                clearFiltersBtn.addEventListener('click', function() {
+                    activeFilters = {
+                        search: '',
+                        category: null,
+                        tags: []
+                    };
+                    searchInput.value = '';
+                    document.querySelectorAll('.category-tag, .tag').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    filterRecipes();
+                });
+            }
+
+            // Filter recipes based on active filters
+            function filterRecipes() {
+                const filtered = recipes.filter(recipe => {
+                    // Search filter
+                    if (activeFilters.search) {
+                        const searchLower = activeFilters.search;
+                        const matchesSearch = 
+                            recipe.name.toLowerCase().includes(searchLower) ||
+                            recipe.category.toLowerCase().includes(searchLower) ||
+                            recipe.ingredients.some(i => i.toLowerCase().includes(searchLower)) ||
+                            recipe.tags.some(tag => tag.toLowerCase().includes(searchLower));
+                        
+                        if (!matchesSearch) return false;
+                    }
+
+                    // Category filter
+                    if (activeFilters.category && recipe.category !== activeFilters.category) {
+                        return false;
+                    }
+
+                    // Tag filters
+                    if (activeFilters.tags.length > 0) {
+                        const hasAllTags = activeFilters.tags.every(tag => 
+                            recipe.tags.includes(tag)
+                        );
+                        if (!hasAllTags) return false;
+                    }
+
+                    return true;
+                });
+
+                renderRecipeList(filtered);
+            }
+
+            // Render the list of recipes
+            function renderRecipeList(filteredRecipes = recipes) {
+                recipesContainer.innerHTML = '';
+                
+                if (filteredRecipes.length === 0) {
+                    noResults.style.display = 'block';
+                    resultsCount.textContent = '0 recipes';
+                    return;
+                }
+
+                noResults.style.display = 'none';
+                resultsCount.textContent = `${filteredRecipes.length} recipe${filteredRecipes.length !== 1 ? 's' : ''}`;
+                
+                filteredRecipes.forEach(recipe => {
+                    const recipeItem = document.createElement('div');
+                    recipeItem.className = 'recipe-item';
+                    
+                    const tagsDisplay = recipe.tags.length > 0 ? recipe.tags.join(' · ') : '';
+                    
+                    recipeItem.innerHTML = `
+                        <div>
+                            <div class="recipe-name">${recipe.name}</div>
+                            <div class="recipe-tags-inline">${tagsDisplay}</div>
+                        </div>
+                        <span class="recipe-cuisine">${recipe.category}</span>
+                    `;
+                    recipeItem.addEventListener('click', () => showRecipeDetail(recipe.id));
+                    recipesContainer.appendChild(recipeItem);
+                });
+            }
+
+            // Show recipe detail view
+            function showRecipeDetail(recipeId, updateHash = true) {
+                const recipe = recipes.find(r => r.id === recipeId);
+                if (!recipe) return;
+
+                if (updateHash) {
+                    window.location.hash = `recipe/${recipeId}`;
+                }
+
+                // Build tags
+                const tagsHtml = recipe.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+
+                // Build ingredients list
+                const ingredientsList = recipe.ingredients
+                    .map(ingredient => `<li>${ingredient}</li>`)
+                    .join('');
+
+                // Build instructions list
+                const instructionsList = recipe.instructions
+                    .map(instruction => `<li>${instruction}</li>`)
+                    .join('');
+
+                // Render recipe detail
+                recipeContent.innerHTML = `
+                    <h2>${recipe.name}</h2>
+                    <div class="recipe-meta">${recipe.category}</div>
+                    ${tagsHtml ? `<div class="recipe-tags-detail">${tagsHtml}</div>` : ''}
+                    
+                    <h3>Ingredients</h3>
+                    <ul>${ingredientsList}</ul>
+                    
+                    <h3>Instructions</h3>
+                    <ol>${instructionsList}</ol>
+                `;
+
+                // Switch views
+                hideAllViews();
+                recipeDetailView.classList.add('active');
+                window.scrollTo(0, 0);
+            }
+
+            // Setup navigation
+            function setupNavigation() {
+                navLinks.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const view = link.dataset.view;
+
+                        // Show appropriate view
+                        if (view === 'list') {
+                            showRecipeListView();
+                        } else if (view === 'about') {
+                            showAboutView();
+                        }
+                    });
+                });
+            }
+
+            // Setup back button
+            function setupBackButton() {
+                backButton.addEventListener('click', () => {
+                    showRecipeListView();
+                });
+            }
+
+            // Hide all views
+            function hideAllViews() {
+                recipeListView.classList.remove('active');
+                recipeDetailView.classList.remove('active');
+                aboutView.classList.remove('active');
+            }
+
+            // Handle URL hash changes (for browser back/forward and deep linking)
+            function handleHashChange() {
+                const hash = window.location.hash.slice(1); // Remove the # symbol
+                
+                if (hash.startsWith('recipe/')) {
+                    const recipeId = parseInt(hash.split('/')[1]);
+                    showRecipeDetail(recipeId, false); // false = don't update URL
+                } else if (hash === 'about') {
+                    showAboutView(false);
+                } else {
+                    // Default to recipe list view
+                    showRecipeListView(false);
+                }
+            }
+
+            // Navigate to recipe list view
+            function showRecipeListView(updateHash = true) {
+                if (updateHash) {
+                    window.location.hash = 'recipes';
+                }
+                
+                hideAllViews();
+                recipeListView.classList.add('active');
+                
+                // Update nav
+                navLinks.forEach(l => l.classList.remove('active'));
+                document.querySelector('[data-view="list"]').classList.add('active');
+                
+                window.scrollTo(0, 0);
+            }
+
+            // Navigate to about view
+            function showAboutView(updateHash = true) {
+                if (updateHash) {
+                    window.location.hash = 'about';
+                }
+                
+                hideAllViews();
+                aboutView.classList.add('active');
+                
+                // Update nav
+                navLinks.forEach(l => l.classList.remove('active'));
+                document.querySelector('[data-view="about"]').classList.add('active');
+                
+                window.scrollTo(0, 0);
+            }
+        });
+    </script>
+</body>
 </html>
